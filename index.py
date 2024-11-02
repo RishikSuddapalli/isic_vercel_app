@@ -1,34 +1,15 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template
 from flask_cors import CORS
+from my_flask_app.model import Model
 import numpy as np
 from PIL import Image
-import tensorflow as tf
 import io
 
 app = Flask(__name__)
 CORS(app)
 
-# Define Model class and load the model
-class Model:
-    def __init__(self, model_path):
-        self.model = tf.keras.models.load_model(model_path)
-        self.class_names = [
-            'Actinic keratosis', 'Basal cell carcinoma', 'Benign keratosis', 
-            'Dermatofibroma', 'Melanocytic nevus', 'Melanoma', 
-            'Squamous cell carcinoma', 'Vascular lesion'
-        ]
-
-    def predict(self, image):
-        image = tf.image.resize(image, (240, 240))
-        image = image / 255.0
-        image = tf.expand_dims(image, axis=0)
-        predictions = self.model.predict(image)
-        predicted_class = self.class_names[tf.argmax(predictions[0])]
-        confidence = float(tf.reduce_max(predictions[0]))
-        return {"class": predicted_class, "confidence": confidence}
-
 # Load the model
-model_path = 'ENB1_8Class30.h5'
+model_path = 'ENB1_8Class30.h5' 
 model = Model(model_path)
 
 @app.route('/')
@@ -38,24 +19,20 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
+        return "No file part"
+
     
     file = request.files['file']
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+        return "No selected file"
 
-    try:
-        # Read and process the image
-        img = Image.open(file.stream).convert("RGB")
-        img_array = np.array(img)
+    # Read the image
+    img = Image.open(file.stream)
+    img_array = np.array(img)
 
-        # Make prediction
-        prediction = model.predict(img_array)
-        return jsonify(prediction)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    # Make prediction
+    prediction = model.predict(img_array)
+    return prediction
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
-    
+    app.run(debug=True) 
