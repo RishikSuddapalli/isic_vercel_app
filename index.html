@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #4a90e2;
+        }
+        form {
+            margin: 20px auto;
+            padding: 20px;
+            border: 2px solid #4a90e2;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #4a90e2;
+            border-radius: 5px;
+            width: 250px;
+        }
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #357ab8;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #4a90e2;
+        }
+        #loading {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Classification using EfficientNetB1</h1>
+    <form id="uploadForm" action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required>
+        <button type="submit">Classify</button>
+    </form>
+    <div id="loading">Classifying... Please wait...</div>
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+
+        form.onsubmit = function() {
+            loading.style.display = 'block';
+            resultDiv.innerHTML = ''; // Clear previous results
+        };
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.text();
+            loading.style.display = 'none';
+            resultDiv.innerHTML = `<strong>Prediction:</strong> ${result}`;
+        });
+    </script>
+</body>
+</html>
