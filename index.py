@@ -42,7 +42,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load the model
-model = Model("1mOPikpQYetgI4hxKXEcZWsPoMe0HpIBF/view?usp=sharing")
+model = Model("1ykRZdGEdYh0L2kV26RPFOtOK--Q8yrJ_/view?usp=sharing")
 
 @app.route('/')
 def index():
